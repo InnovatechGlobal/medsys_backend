@@ -8,7 +8,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse
 from sqlalchemy.orm import Session
 
-from app.author.apis import router as author_router
+
 from app.common.dependencies import get_session
 from app.common.exceptions import NotFound
 from app.core.handlers import (
@@ -77,4 +77,3 @@ async def health(_: Session = Depends(get_session)):
 
 
 # Routers
-app.include_router(author_router, prefix="/author", tags=["Author APIs"])
