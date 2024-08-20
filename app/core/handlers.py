@@ -3,10 +3,10 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import ORJSONResponse
 
-from app.common.exceptions import NotFound
+from app.common.exceptions import CustomHTTPException
 
 
-async def base_exception_handler(_: Request, exc: Exception):
+async def base_exception_handler(_: Request, _1: Exception):
     """
     Exception handler for 'NotFound' exception
     """
@@ -44,12 +44,12 @@ async def request_validation_exception_handler(_: Request, exc: RequestValidatio
     )
 
 
-async def not_found_exception_handler(_: Request, exc: NotFound):
+async def custom_http_exception_handler(_: Request, exc: CustomHTTPException):
     """
-    Exception handler for 'NotFound' exception
+    Exception handler for 'CustomHTTPException' exception
     """
     return ORJSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
+        status_code=exc.status_code,
         content=jsonable_encoder(
             {
                 "status": "error",

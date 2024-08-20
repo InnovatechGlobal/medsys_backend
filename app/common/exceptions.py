@@ -1,8 +1,9 @@
-class NotFound(Exception):
+class CustomHTTPException(Exception):
     """
-    Common base class for all 404 responses
+    Common base class for all http response exceptions
     """
 
-    def __init__(self, *, msg: str, loc: list = []):
+    def __init__(self, msg: str, *, status_code: int, loc: list | None = None):
         self.msg = msg
+        self.status_code = status_code
         self.loc = loc
