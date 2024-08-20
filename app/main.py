@@ -8,6 +8,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse
 from sqlalchemy.orm import Session
 
+from app.auth.apis import router as auth_router
 from app.common.dependencies import get_session
 from app.common.exceptions import CustomHTTPException
 from app.core.handlers import (
@@ -76,3 +77,4 @@ async def health(_: Session = Depends(get_session)):
 
 
 # Routers
+app.include_router(auth_router, prefix="/auth", tags=["Auth APIs"])
