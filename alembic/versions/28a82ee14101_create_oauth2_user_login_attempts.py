@@ -24,8 +24,9 @@ def upgrade() -> None:
     op.create_table(
         "oauth2_user_login_attempts",
         sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
-        sa.Column("service", sa.String(10), nullable=False),
+        sa.Column("service", sa.String(20), nullable=False),
         sa.Column("state_token", sa.String(10), unique=True, nullable=False),
+        sa.Column("redirect_url", sa.String, nullable=False),
         sa.Column("is_used", sa.Boolean, server_default=sa.false(), nullable=False),
         sa.Column(
             "created_at",

@@ -3,7 +3,49 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import ORJSONResponse
 
-from app.common.exceptions import CustomHTTPException
+from app.common.exceptions import (
+    BadGatewayError,
+    CustomHTTPException,
+    InternalServerError,
+)
+
+
+async def internal_server_error_exception_handler(_: Request, exc: InternalServerError):
+    """
+    Exception handler for 'InternalServerError' exception
+    """
+    # Send email to staff
+    # sendgrid.send_email()
+    print(exc)
+    return ORJSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content=jsonable_encoder(
+            {
+                "status": "error",
+                "error": {"msg": "Internal Server Error", "loc": []},
+                "data": None,
+            }
+        ),
+    )
+
+
+async def bad_gateway_error_exception_handler(_: Request, exc: BadGatewayError):
+    """
+    Exception handler for 'BadGatewayError' exception
+    """
+    # Send email to staff
+    # sendgrid.send_email()
+    print(exc)
+    return ORJSONResponse(
+        status_code=status.HTTP_502_BAD_GATEWAY,
+        content=jsonable_encoder(
+            {
+                "status": "error",
+                "error": {"msg": "Bad Gateway Please Contact Support", "loc": exc.loc},
+                "data": None,
+            }
+        ),
+    )
 
 
 async def base_exception_handler(_: Request, _1: Exception):

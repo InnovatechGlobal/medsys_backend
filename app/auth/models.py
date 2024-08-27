@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import cast
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
 
 from app.core.database import DBBase
@@ -11,9 +12,12 @@ class OAuth2UserLoginAttempt(DBBase):
 
     __tablename__ = "oauth2_user_login_attempts"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    service = Column(String(10), nullable=False)
-    state_token = Column(String(10), unique=True, nullable=False)
-    is_used = Column(Boolean, default=False, nullable=False)
-    created_at = Column(DateTime(timezone=True), default=datetime.now, nullable=False)
-    expires_at = Column(DateTime(timezone=True), nullable=False)
+    id = cast(int, Column(Integer, primary_key=True, autoincrement=True))
+    service = cast(str, Column(String(20), nullable=False))
+    state_token = cast(str, Column(String(10), unique=True, nullable=False))
+    redirect_url = cast(str, Column(String, nullable=False))
+    is_used = cast(bool, Column(Boolean, default=False, nullable=False))
+    created_at = cast(
+        datetime, Column(DateTime(timezone=True), default=datetime.now, nullable=False)
+    )
+    expires_at = cast(datetime, Column(DateTime(timezone=True), nullable=False))

@@ -10,7 +10,11 @@ services:
       - 8000:8000
     environment:
       - DEBUG=true
-      - POSTGRES_DATABASE_URL=postgresql://behemoth:backend@behemoth_db:5432/behemoth_db
+      - OAUTH2_STATE_EXPIRE_MIN=30
+      - CRIIPTO_VERIFY_DOMAIN=supersecret
+      - CRIIPTO_VERIFY_CLIENT_ID=supersecret
+      - CRIIPTO_VERIFY_CLIENT_SECRET=supersecret
+      - POSTGRES_DATABASE_URL=postgresql+asyncpg://behemoth:backend@behemoth_db:5432/behemoth_db
     depends_on:
       - behemoth_db
     networks:
