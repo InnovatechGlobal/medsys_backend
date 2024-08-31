@@ -15,6 +15,34 @@ router = APIRouter()
 criipto_verify_client = InternalCriiptoVerifyClient()
 
 
+@router.get(
+    "/bankid",
+    summary="Get list of bankid options",
+    response_description="The list of available bankid options",
+    status_code=status.HTTP_200_OK,
+    response_model=response.BankIDOptionListResponse,
+)
+async def route_auth_oauth2_bankid_options():
+    """
+    This endpoint returns the list of available bankid login options
+    """
+    return {"data": [{"name": "Norwegian BankID", "code": "nobankid"}]}
+
+
+@router.get(
+    "/eid",
+    summary="Get list of eid options",
+    response_description="The list of available eid options",
+    status_code=status.HTTP_200_OK,
+    response_model=response.EIDOptionListResponse,
+)
+async def route_auth_oauth2_eid_options():
+    """
+    This endpoint returns the list of available e-id login options
+    """
+    return {"data": []}
+
+
 @router.post(
     "/bankid",
     summary="SSO login with Norwegian Bank ID",

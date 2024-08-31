@@ -84,6 +84,5 @@ async def health(_: Session = Depends(get_session)):
     return {"status": "Ok!"}
 
 
-
 # Routers
 app.include_router(auth_router, prefix="/auth", tags=["Auth APIs"])
