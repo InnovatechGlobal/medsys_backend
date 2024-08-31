@@ -45,7 +45,7 @@ async def route_auth_oauth2_eid_options():
 
 @router.post(
     "/bankid",
-    summary="SSO login with Norwegian Bank ID",
+    summary="Initialize SSO Login",
     response_description="Redirect to sso login",
     status_code=status.HTTP_200_OK,
     response_model=response.SSOLoginRequestResponse,
@@ -54,7 +54,7 @@ async def auth_oauth2_bankid_login(
     service: BankIDOAuth2Services, redirect_url: AnyHttpUrl, db: DatabaseSession
 ):
     """
-    This endpoint initiates Norwegian bankID
+    This endpoint initiates SSO Login
     """
 
     # Generate state token
@@ -77,14 +77,14 @@ async def auth_oauth2_bankid_login(
 
 @router.post(
     "/nobankid/verify",
-    summary="Verify Norwegian SSO Login",
+    summary="Verify SSO Login",
     response_description="The user's details and tokens",
     status_code=status.HTTP_200_OK,
     # response_model=response.UserLoginResponse,
 )
 async def auth_oauth2_nobankid_verify(code: str, state: str, db: DatabaseSession):
     """
-    This endpoint verifies the Norwegian bank ID SSO login
+    This endpoint verifies the SSO login
     """
 
     # Verify oauth2_token
