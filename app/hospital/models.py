@@ -39,4 +39,4 @@ class HospitalStaff(DBBase):
         unique=True,  # User can only be a staff to one hospital
         nullable=False,
     )
-    created_at = Column(DateTime(timezone=True), nullable=False)
+    created_at = Column(DateTime(timezone=True), default=datetime.now, nullable=False)

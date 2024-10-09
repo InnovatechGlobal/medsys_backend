@@ -34,3 +34,12 @@ class UserLoginResponse(ResponseSchema):
     """
 
     data: UserLogin = Field(description="The user's access and refresh tokens")
+
+
+class TokenRefreshResponse(ResponseSchema):
+    """
+    Response schema for token refresh
+    """
+
+    msg: str = "Access token refreshed successfully"
+    data: str = Field(description="The new access token")

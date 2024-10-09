@@ -1,6 +1,5 @@
 import secrets
 from datetime import datetime, timedelta
-from typing import Literal
 
 from pydantic import AnyHttpUrl
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -84,12 +83,12 @@ async def verify_oauth2_token(state: str, service: str, db: AsyncSession):
     return oauth2_login_attempt
 
 
-async def create_refresh_token(type: Literal["user"], db: AsyncSession):  # pylint: disable=redefined-builtin
+async def create_refresh_token(sub: str, db: AsyncSession):  # pylint: disable=redefined-builtin
     """
     Create refresh token obj.
 
     Args:
-        type ("user"): The refresh token type.
+        sub (str): The refresh token sub.
         db (AsyncSession): The async db session.
 
     Returns:
@@ -102,7 +101,7 @@ async def create_refresh_token(type: Literal["user"], db: AsyncSession):  # pyli
     created_at = datetime.now()
     refresh_token = await refresh_token_crud.create(
         data={
-            "type": type,
+            "sub": sub,
             "content": secrets.token_urlsafe(32),
             "expires_at": created_at
             + timedelta(hours=settings.REFRESH_TOKEN_EXPIRE_HOURS),
@@ -125,7 +124,7 @@ async def generate_user_tokens(*, user: user_models.User, db: AsyncSession):
         Tuple (access_token, refresh_token): The user's access and refresh token
     """
     # Create refresh token
-    ref_token = await create_refresh_token(type="user", db=db)
+    ref_token = await create_refresh_token(sub=f"USER${user.id}", db=db)
 
     # Generate access token
     access_token = await token_generator.generate(

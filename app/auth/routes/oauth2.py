@@ -1,17 +1,21 @@
-from datetime import date
+from datetime import date, datetime, timezone
+from typing import Annotated
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Body, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import ORJSONResponse
 from pydantic import AnyHttpUrl
 
 from app.auth import services
 from app.auth.annotations import BankIDOAuth2Services
+from app.auth.crud import RefreshTokenCRUD
 from app.auth.schemas import response
 from app.auth.types import OAUTH2_SERVICES
 from app.common.annotations import DatabaseSession
 from app.common.exceptions import Unauthorized
+from app.common.token import TokenGenerator
 from app.common.utils import generate_state_token
+from app.core.settings import get_settings
 from app.external.criipto import utils as criipto_utils
 from app.external.criipto.clients import InternalCriiptoVerifyClient
 from app.user import formatters as user_formatters
@@ -21,7 +25,9 @@ from app.user.schemas import create as user_schemas_create
 
 # Globals
 router = APIRouter()
+settings = get_settings()
 criipto_verify_client = InternalCriiptoVerifyClient()
+token_generator = TokenGenerator(secret_key=settings.SECRET_KEY)
 
 
 @router.get(
@@ -152,3 +158,37 @@ async def route_auth_oauth2_verify(code: str, state: str, db: DatabaseSession):
         },
         status_code=response_status,
     )
+
+
+@router.post(
+    "/token",
+    summary="Refresh Token",
+    response_description="The new access token",
+    status_code=status.HTTP_200_OK,
+    response_model=response.TokenRefreshResponse,
+)
+async def route_oauth2_token(
+    token: Annotated[str, Body(embed=True)], db: DatabaseSession
+):
+    """
+    This endpoint refreshes the user's token
+    """
+
+    # Init crud
+    token_crud = RefreshTokenCRUD(db=db)
+
+    # Get refresh token
+    token = await token_crud.get(content=token)
+    if not token:
+        raise Unauthorized("Invalid Refresh Token", loc=["body", "token"])
+
+    # Check: expired
+    if bool(datetime.now(timezone.utc) > token.expires_at.replace(tzinfo=timezone.utc)):
+        raise Unauthorized("Refresh Token Has Expired", loc=["body", "token"])
+
+    # Generate access token
+    access_token = await token_generator.generate(
+        sub=str(token.sub), refresh_token_id=token.id
+    )
+
+    return {"data": access_token}

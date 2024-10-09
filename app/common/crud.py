@@ -15,14 +15,16 @@ class CRUDBase(Generic[T]):
         self.model = model
         self.db = db
 
-    async def create(self, *, data: dict):
+    async def create(self, *, data: dict, commit: bool = True):
         """
         Create object
         """
         db_obj = self.model(**data)
         self.db.add(db_obj)
-        await self.db.commit()
-        await self.db.refresh(db_obj)
+
+        if commit:
+            await self.db.commit()
+            await self.db.refresh(db_obj)
 
         return db_obj
 
