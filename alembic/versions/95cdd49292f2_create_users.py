@@ -25,11 +25,11 @@ def upgrade() -> None:
         "users",
         sa.Column("id", PG_UUID(as_uuid=True), primary_key=True),
         sa.Column("full_name", sa.String(255), nullable=False),
-        sa.Column("email", sa.String(255), unique=True, nullable=False),
+        sa.Column("email", sa.String(255), unique=True, nullable=True),
         sa.Column(
             "gender",
             sa.Enum("MALE", "FEMALE", "OTHER", name="enum_genders"),
-            nullable=False,
+            nullable=True,
         ),
         sa.Column("medical_id", sa.String(12), nullable=True),
         sa.Column("dob", sa.Date, nullable=False),
@@ -51,3 +51,5 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_table("users")
+    op.execute("DROP TYPE IF EXISTS enum_genders")
+    op.execute("DROP TYPE IF EXISTS enum_account_types")
