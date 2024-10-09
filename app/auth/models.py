@@ -28,7 +28,7 @@ class RefreshToken(DBBase):
     Database model for refresh tokens
     """
 
-    __tablename__ = "refresh_tokes"
+    __tablename__ = "refresh_tokens"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     type = Column(String(10), nullable=False)
