@@ -31,7 +31,7 @@ class RefreshToken(DBBase):
     __tablename__ = "refresh_tokens"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    type = Column(String(10), nullable=False)
+    sub = Column(String(50), nullable=False)
     content = Column(String, nullable=False)
     last_used_at = Column(DateTime(timezone=True), nullable=True)
     expires_at = Column(DateTime(timezone=True), nullable=False)

@@ -23,7 +23,7 @@ def upgrade() -> None:
     op.create_table(
         "refresh_tokens",
         sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
-        sa.Column("type", sa.String(10), nullable=False),
+        sa.Column("sub", sa.String(50), nullable=False),
         sa.Column("content", sa.String, nullable=False),
         sa.Column("last_used_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("expires_at", sa.DateTime(timezone=True), nullable=True),
