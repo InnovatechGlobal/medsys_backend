@@ -14,6 +14,11 @@ class Settings(BaseSettings):
     DEBUG: bool = os.environ.get("DEBUG")
     OAUTH2_STATE_EXPIRE_MIN: int = os.environ.get("OAUTH2_STATE_EXPIRE_MIN")
 
+    # Security
+    SECRET_KEY: str = os.environ.get("SECRET_KEY")
+    REFRESH_TOKEN_EXPIRE_HOURS: int = os.environ.get("REFRESH_TOKEN_EXPIRE_HOURS")
+    ACCESS_TOKEN_EXPIRE_MINS: int = os.environ.get("ACCESS_TOKEN_EXPIRE_MINS")
+
     # Criipto
     CRIIPTO_VERIFY_DOMAIN: str = os.environ.get("CRIIPTO_VERIFY_DOMAIN")
     CRIIPTO_VERIFY_CLIENT_ID: str = os.environ.get("CRIIPTO_VERIFY_CLIENT_ID")
