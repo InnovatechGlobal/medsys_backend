@@ -44,7 +44,7 @@ async def route_auth_oauth2_eid_options():
 
 
 @router.post(
-    "/bankid",
+    "",
     summary="Initialize SSO Login",
     response_description="Redirect to sso login",
     status_code=status.HTTP_200_OK,
@@ -76,7 +76,7 @@ async def auth_oauth2_bankid_login(
 
 
 @router.post(
-    "/nobankid/verify",
+    "/verify",
     summary="Verify SSO Login",
     response_description="The user's details and tokens",
     status_code=status.HTTP_200_OK,
