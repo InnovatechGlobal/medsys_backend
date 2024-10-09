@@ -11,7 +11,7 @@ class CRUDBase(Generic[T]):
     CRUD object with default methods to Create, Read, Update, Delete (CRUD).
     """
 
-    def __init__(self, model: Type[T], db: AsyncSession):
+    def __init__(self, model: Type[T], *, db: AsyncSession):
         self.model = model
         self.db = db
 

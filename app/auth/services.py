@@ -1,16 +1,21 @@
+import secrets
 from datetime import datetime, timedelta
+from typing import Literal
 
 from pydantic import AnyHttpUrl
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth import selectors
-from app.auth.crud import OAuth2LoginAttemptCRUD
+from app.auth.crud import OAuth2LoginAttemptCRUD, RefreshTokenCRUD
 from app.auth.schemas import create
 from app.common.exceptions import Unauthorized
+from app.common.token import TokenGenerator
 from app.core.settings import get_settings
+from app.user import models as user_models
 
 # Globals
 settings = get_settings()
+token_generator = TokenGenerator(secret_key=settings.SECRET_KEY)
 
 
 async def create_oauth2_login_attempt(
@@ -77,3 +82,58 @@ async def verify_oauth2_token(state: str, service: str, db: AsyncSession):
         raise Unauthorized("Token has been used")
 
     return oauth2_login_attempt
+
+
+async def create_refresh_token(type: Literal["user"], db: AsyncSession):  # pylint: disable=redefined-builtin
+    """
+    Create refresh token obj.
+
+    Args:
+        type ("user"): The refresh token type.
+        db (AsyncSession): The async db session.
+
+    Returns:
+        models.RefreshToken: The created refresh token.
+    """
+    # Init crud
+    refresh_token_crud = RefreshTokenCRUD(db=db)
+
+    # Create refresh token
+    created_at = datetime.now()
+    refresh_token = await refresh_token_crud.create(
+        data={
+            "type": type,
+            "content": secrets.token_urlsafe(32),
+            "expires_at": created_at
+            + timedelta(hours=settings.REFRESH_TOKEN_EXPIRE_HOURS),
+            "created_at": created_at,
+        }
+    )
+
+    return refresh_token
+
+
+async def generate_user_tokens(*, user: user_models.User, db: AsyncSession):
+    """
+    Generate user tokens
+
+    Args:
+        user (user_models.User): The user obj
+        db (AsyncSession): The async db session
+
+    Returns:
+        Tuple (access_token, refresh_token): The user's access and refresh token
+    """
+    # Create refresh token
+    ref_token = await create_refresh_token(type="user", db=db)
+
+    # Generate access token
+    access_token = await token_generator.generate(
+        sub=f"USER${user.id}", refresh_token_id=ref_token.id
+    )
+
+    # Update user last login
+    user.last_login = ref_token.created_at
+    await db.commit()
+
+    return access_token, ref_token.content

@@ -1,6 +1,6 @@
 from pydantic import Field
 
-from app.auth.schemas.base import BankIDOption, EIDOption
+from app.auth.schemas.base import BankIDOption, EIDOption, UserLogin
 from app.common.schemas import ResponseSchema
 
 
@@ -32,3 +32,5 @@ class UserLoginResponse(ResponseSchema):
     """
     Response schema for user login
     """
+
+    data: UserLogin = Field(description="The user's access and refresh tokens")

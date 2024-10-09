@@ -1,4 +1,8 @@
+from datetime import date
+
 from fastapi import APIRouter, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import ORJSONResponse
 from pydantic import AnyHttpUrl
 
 from app.auth import services
@@ -6,12 +10,17 @@ from app.auth.annotations import BankIDOAuth2Services
 from app.auth.schemas import response
 from app.auth.types import OAUTH2_SERVICES
 from app.common.annotations import DatabaseSession
+from app.common.exceptions import Unauthorized
 from app.common.utils import generate_state_token
+from app.external.criipto import utils as criipto_utils
 from app.external.criipto.clients import InternalCriiptoVerifyClient
+from app.user import formatters as user_formatters
+from app.user import selectors as user_selectors
+from app.user import services as user_services
+from app.user.schemas import create as user_schemas_create
 
+# Globals
 router = APIRouter()
-
-# Clients
 criipto_verify_client = InternalCriiptoVerifyClient()
 
 
@@ -50,7 +59,7 @@ async def route_auth_oauth2_eid_options():
     status_code=status.HTTP_200_OK,
     response_model=response.SSOLoginRequestResponse,
 )
-async def auth_oauth2_bankid_login(
+async def route_auth_oauth2_login(
     service: BankIDOAuth2Services, redirect_url: AnyHttpUrl, db: DatabaseSession
 ):
     """
@@ -80,9 +89,9 @@ async def auth_oauth2_bankid_login(
     summary="Verify SSO Login",
     response_description="The user's details and tokens",
     status_code=status.HTTP_200_OK,
-    # response_model=response.UserLoginResponse,
+    response_model=response.UserLoginResponse,
 )
-async def auth_oauth2_nobankid_verify(code: str, state: str, db: DatabaseSession):
+async def route_auth_oauth2_verify(code: str, state: str, db: DatabaseSession):
     """
     This endpoint verifies the SSO login
     """
@@ -93,8 +102,48 @@ async def auth_oauth2_nobankid_verify(code: str, state: str, db: DatabaseSession
     )
 
     # Generate refresh and access token
-    _response = await criipto_verify_client.verify_code(
+    verify_response = await criipto_verify_client.verify_code(
         code=code, redirect_url=oauth2_login_attempt.redirect_url
     )
 
-    return _response
+    # Get ID Token
+    token = verify_response.get("id_token")
+    if not token:
+        raise Unauthorized("Invalid Login Request")
+
+    # Decode token
+    data = await criipto_utils.decode_token(token=verify_response["id_token"])
+
+    # Get user
+    user = await user_selectors.get_user(sub=data["sub"], db=db, raise_exc=False)
+
+    # Check: user exists
+    response_status = 200
+
+    if not user:
+        user = await user_services.create_user(
+            data=user_schemas_create.UserCreate(
+                **{
+                    "account_type": "INDIVIDUAL",
+                    "criipto_sub": data["sub"],
+                    "full_name": data["name"],
+                    "dob": date.fromisoformat(data["birthdate"]),
+                    "country": data["country"],
+                }
+            ),
+            db=db,
+        )
+        response_status = 201
+
+    # Generate tokens
+    access, refresh = await services.generate_user_tokens(user=user, db=db)
+
+    return ORJSONResponse(
+        content={
+            "data": {
+                "user": jsonable_encoder(await user_formatters.format_user(user=user)),
+                "tokens": {"access_token": access, "refresh_token": refresh},
+            }
+        },
+        status_code=response_status,
+    )

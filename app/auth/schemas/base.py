@@ -1,5 +1,8 @@
 from pydantic import BaseModel, Field
 
+from app.common.schemas import TokenResponse
+from app.user.schemas import base as user_base_schemas
+
 
 class BankIDOption(BaseModel):
     """
@@ -17,3 +20,12 @@ class EIDOption(BaseModel):
 
     name: str = Field(description="The service name")
     code: str = Field(description="The service code")
+
+
+class UserLogin(BaseModel):
+    """
+    Base schema for user login response
+    """
+
+    user: user_base_schemas.User = Field(description="The user's details")
+    tokens: TokenResponse = Field(description="The user's access and refresh tokens")

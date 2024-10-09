@@ -3,6 +3,15 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 
+class TokenResponse(BaseModel):
+    """
+    Generic schema for token responses
+    """
+
+    access_token: str = Field(description="The access token")
+    refresh_token: str = Field(description="The refresh token")
+
+
 class ResponseSchema(BaseModel):
     """This is the generic base response schema"""
 
