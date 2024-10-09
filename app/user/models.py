@@ -31,5 +31,5 @@ class User(DBBase):
     criipto_sub = Column(String(50), unique=True, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     last_login = Column(DateTime(timezone=True), nullable=True)
-    updated_at = Column(DateTime(timezone=True), nullable=True)
+    updated_at = Column(DateTime(timezone=True), onupdate=datetime.now, nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.now, nullable=False)
