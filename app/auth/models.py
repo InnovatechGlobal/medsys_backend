@@ -21,3 +21,18 @@ class OAuth2UserLoginAttempt(DBBase):
         datetime, Column(DateTime(timezone=True), default=datetime.now, nullable=False)
     )
     expires_at = cast(datetime, Column(DateTime(timezone=True), nullable=False))
+
+
+class RefreshToken(DBBase):
+    """
+    Database model for refresh tokens
+    """
+
+    __tablename__ = "refresh_tokes"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    type = Column(String(10), nullable=False)
+    content = Column(String, nullable=False)
+    last_used_at = Column(DateTime(timezone=True), nullable=True)
+    expires_at = Column(DateTime(timezone=True), nullable=False)
+    created_at = Column(DateTime(timezone=True), default=datetime.now, nullable=False)
