@@ -44,6 +44,15 @@ class Unauthorized(CustomHTTPException):
         super().__init__(msg, status_code=401, loc=loc)
 
 
+class Forbidden(CustomHTTPException):
+    """
+    Common exception class for 403 FORBIDDEN responses
+    """
+
+    def __init__(self, msg: str = "Forbidden", *, loc: list | None = None):
+        super().__init__(msg, status_code=403, loc=loc)
+
+
 class NotFound(CustomHTTPException):
     """
     Common exception class for 404 NOT FOUND responses
