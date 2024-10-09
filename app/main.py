@@ -22,6 +22,12 @@ from app.core.handlers import (
     internal_server_error_exception_handler,
     request_validation_exception_handler,
 )
+from app.core.tags import get_tags
+from app.user.apis import router as user_router
+
+
+# Globals
+tags = get_tags()
 
 
 # Lifespan (startup, shutdown)
@@ -85,4 +91,5 @@ async def health(_: Session = Depends(get_session)):
 
 
 # Routers
-app.include_router(auth_router, prefix="/auth", tags=["Auth APIs"])
+app.include_router(auth_router, prefix="/auth", tags=[tags.AUTH])
+app.include_router(user_router, tags=[tags.USER])
