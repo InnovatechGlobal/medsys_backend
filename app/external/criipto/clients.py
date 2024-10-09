@@ -1,6 +1,9 @@
 import base64
+import json
 from urllib.parse import quote
 
+import jwt
+import jwt.algorithms
 from pydantic import AnyHttpUrl
 
 from app.auth.annotations import BankIDOAuth2Services
@@ -22,6 +25,29 @@ class InternalCriiptoVerifyClient:
         self.client_id = settings.CRIIPTO_VERIFY_CLIENT_ID
         self.client_secret = settings.CRIIPTO_VERIFY_CLIENT_SECRET
         self.request = InternalRequestClient(base_url=settings.CRIIPTO_VERIFY_DOMAIN)
+
+    async def get_public_key(self, kid: str):
+        """
+        Get the public key using the kid
+        """
+        # Get jwks
+        response = await self.request.get(endpoint="/.well-known/jwks")
+
+        # Get json body
+        data = response.json()
+
+        # Get public key
+        public_key = None
+        for key in data["keys"]:
+            if key["kid"] == kid:
+                public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(key))
+                break
+
+        # Check: public key found
+        if public_key is None:
+            raise ValueError(f"No public key found for kid: {kid}")
+
+        return public_key
 
     async def generate_oauth2_url(
         self, *, service: BankIDOAuth2Services, token: str, redirect_url: AnyHttpUrl
