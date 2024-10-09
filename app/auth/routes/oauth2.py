@@ -120,11 +120,16 @@ async def route_auth_oauth2_verify(code: str, state: str, db: DatabaseSession):
     # Check: user exists
     response_status = 200
 
+    # Check: existing user but no account type
+    if user and not bool(user.account_type):
+        print(f"Forcefully set user[{user.id}] to INDIVIDUAL")
+        user.account_type = "INDIVIDUAL"  # type: ignore
+        await db.commit()
+
     if not user:
         user = await user_services.create_user(
             data=user_schemas_create.UserCreate(
                 **{
-                    "account_type": "INDIVIDUAL",
                     "criipto_sub": data["sub"],
                     "full_name": data["name"],
                     "dob": date.fromisoformat(data["birthdate"]),

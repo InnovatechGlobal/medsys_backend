@@ -35,6 +35,15 @@ class BadGatewayError(Exception):
         self.timestamp = datetime.now()
 
 
+class BadRequest(CustomHTTPException):
+    """
+    Common exception class for 400 BAD REQUEST responses
+    """
+
+    def __init__(self, msg: str, *, loc: list | None = None):
+        super().__init__(msg, status_code=400, loc=loc)
+
+
 class Unauthorized(CustomHTTPException):
     """
     Common exception class for 401 UNAUTHORIZED responses
@@ -42,6 +51,15 @@ class Unauthorized(CustomHTTPException):
 
     def __init__(self, msg: str = "Unauthorized", *, loc: list | None = None):
         super().__init__(msg, status_code=401, loc=loc)
+
+
+class InvalidToken(Unauthorized):
+    """
+    Generic exception class for invalid tokens
+    """
+
+    def __init__(self, msg: str = "Invalid Token", *, loc: list | None = None):
+        super().__init__(msg, loc=loc)
 
 
 class Forbidden(CustomHTTPException):

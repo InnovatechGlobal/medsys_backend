@@ -54,13 +54,12 @@ class TokenGenerator:
             algorithm="HS256",
         )
 
-    async def verify(self, token: str, sub_head: str, _: bool = True):
+    async def verify(self, token: str, sub_head: str):
         """This method verifies the token.
 
         Args:
             token (str): The refresh token.
             sub_head (str): The sub head of the token
-            raise_exception (bool = True): raise an exception if token is invalid
 
         Returns:
             str | None: The sub's ID.
@@ -73,16 +72,19 @@ class TokenGenerator:
             )
             sub: str = payload.get("sub")
 
+            # Check: token type
             if payload.get("type") != "access":
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token"
                 )
 
-            if sub.split("-")[0] != sub_head:
+            # Check: sub head
+            if sub.split("$")[0] != sub_head:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token"
                 )
-            return "".join(sub.split("-")[1:])
+
+            return sub.split("$")[1]
 
         except jwt.ExpiredSignatureError:
             raise HTTPException(

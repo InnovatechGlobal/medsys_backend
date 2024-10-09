@@ -15,7 +15,4 @@ class UserCreate(BaseModel):
     )
     dob: date = Field(description="The user's dob")
     country: str = Field(description="The user's country", max_length=2)
-    account_type: Literal["INDIVIDUAL", "PRACTITIONER", "ORGANIZATION"] = Field(
-        description="The user's account type"
-    )
     criipto_sub: str = Field(description="The user's criipto sub")

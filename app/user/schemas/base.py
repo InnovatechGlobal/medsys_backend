@@ -18,7 +18,7 @@ class User(BaseModel):
     medical_id: str = Field(description="The user's medical id")
     dob: date = Field(description="The user's dob")
     country: str = Field(description="The user's country", max_length=2)
-    account_type: Literal["INDIVIDUAL", "PRACTITIONER", "ORGANIZATION"] = Field(
+    account_type: Literal["INDIVIDUAL", "PRACTITIONER", "ORGANIZATION"] | None = Field(
         description="The user's account type"
     )
     is_active: bool = Field(description="Indicates if the user's account is active")
