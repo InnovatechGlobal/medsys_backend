@@ -10,4 +10,13 @@ class OAuth2LoginAttemptCRUD(CRUDBase[models.OAuth2UserLoginAttempt]):
     """
 
     def __init__(self, db: AsyncSession):
-        super().__init__(models.OAuth2UserLoginAttempt, db)
+        super().__init__(models.OAuth2UserLoginAttempt, db=db)
+
+
+class RefreshTokenCRUD(CRUDBase[models.RefreshToken]):
+    """
+    CRUD Class for refresh tokens
+    """
+
+    def __init__(self, *, db: AsyncSession):
+        super().__init__(models.RefreshToken, db=db)
