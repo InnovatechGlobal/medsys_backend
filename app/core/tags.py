@@ -15,6 +15,9 @@ class RouteTags(BaseModel):
     # User
     USER: str = "User APIs"
 
+    # Hospital
+    HOSPITAL: str = "Hospital APIs"
+
 
 @lru_cache
 def get_tags():
