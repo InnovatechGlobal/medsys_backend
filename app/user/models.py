@@ -26,7 +26,7 @@ class User(DBBase):
     country = Column(String(2), nullable=False)
     account_type = Column(
         Enum("INDIVIDUAL", "PRACTITIONER", "ORGANIZATION", name="enum_account_types"),
-        nullable=False,
+        nullable=True,
     )
     criipto_sub = Column(String(50), unique=True, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)

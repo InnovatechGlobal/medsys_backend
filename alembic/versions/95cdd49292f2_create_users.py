@@ -39,7 +39,7 @@ def upgrade() -> None:
             sa.Enum(
                 "INDIVIDUAL", "PRACTITIONER", "ORGANIZATION", name="enum_account_types"
             ),
-            nullable=False,
+            nullable=True,
         ),
         sa.Column("criipto_sub", sa.String(50), unique=True, nullable=False),
         sa.Column("is_active", sa.Boolean, server_default=sa.true(), nullable=False),
