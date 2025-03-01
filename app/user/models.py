@@ -1,7 +1,16 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, Date, DateTime, Enum, String
+from sqlalchemy import (
+    Boolean,
+    Column,
+    Date,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Integer,
+    String,
+)
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 
 from app.core.database import DBBase
@@ -22,6 +31,9 @@ class User(DBBase):
         nullable=True,
     )
     medical_id = Column(String(12), nullable=True)
+    hospital_id = Column(
+        Integer, ForeignKey("hospitals.id", ondelete="SET NULL"), nullable=True
+    )
     dob = Column(Date, nullable=False)
     country = Column(String(2), nullable=False)
     account_type = Column(
