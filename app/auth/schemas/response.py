@@ -1,4 +1,4 @@
-from pydantic import Field
+from pydantic import Field, HttpUrl
 
 from app.auth.schemas.base import BankIDOption, EIDOption, UserLogin
 from app.common.schemas import ResponseSchema
@@ -25,7 +25,7 @@ class SSOLoginRequestResponse(ResponseSchema):
     Response schema for sso login response
     """
 
-    data: dict[str, str]
+    data: dict[str, HttpUrl] = Field("The SSO Redirect URL")
 
 
 class UserLoginResponse(ResponseSchema):

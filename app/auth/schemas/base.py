@@ -27,5 +27,8 @@ class UserLogin(BaseModel):
     Base schema for user login response
     """
 
+    is_existing: bool = Field(
+        description="This indicates if the user has an existing account or not"
+    )
     user: user_base_schemas.User = Field(description="The user's details")
     tokens: TokenResponse = Field(description="The user's access and refresh tokens")
