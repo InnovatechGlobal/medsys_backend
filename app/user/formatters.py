@@ -1,3 +1,4 @@
+from app.hospital import formatters as hospital_formatters
 from app.user import models
 
 
@@ -11,6 +12,9 @@ async def format_user(user: models.User):
         "email": user.email,
         "gender": user.gender,
         "medical_id": user.medical_id,
+        "hospital": await hospital_formatters.format_hospital(hosp=user.hospital)
+        if user.hospital
+        else None,
         "dob": user.dob,
         "country": user.country,
         "account_type": user.account_type,

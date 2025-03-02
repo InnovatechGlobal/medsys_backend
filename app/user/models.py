@@ -12,8 +12,10 @@ from sqlalchemy import (
     String,
 )
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+from sqlalchemy.orm import Mapped, relationship
 
 from app.core.database import DBBase
+from app.hospital import models as hospital_models
 
 
 class User(DBBase):
@@ -45,3 +47,7 @@ class User(DBBase):
     last_login = Column(DateTime(timezone=True), nullable=True)
     updated_at = Column(DateTime(timezone=True), onupdate=datetime.now, nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.now, nullable=False)
+
+    hospital: Mapped[hospital_models.Hospital | None] = relationship(
+        "Hospital", lazy="immediate", backref="users"
+    )

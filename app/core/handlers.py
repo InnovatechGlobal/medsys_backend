@@ -16,7 +16,7 @@ async def internal_server_error_exception_handler(_: Request, exc: InternalServe
     """
     # Send email to staff
     # sendgrid.send_email()
-    print(exc)
+    print(exc.msg, exc.loc)
     return ORJSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content=jsonable_encoder(
@@ -48,12 +48,13 @@ async def bad_gateway_error_exception_handler(_: Request, exc: BadGatewayError):
     )
 
 
-async def base_exception_handler(_: Request, _1: Exception):
+async def base_exception_handler(_: Request, exc: Exception):
     """
-    Exception handler for 'NotFound' exception
+    Exception handler for base exceptions
     """
     # Send email to staff
     # sendgrid.send_email()
+    print(exc)
     return ORJSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content=jsonable_encoder(

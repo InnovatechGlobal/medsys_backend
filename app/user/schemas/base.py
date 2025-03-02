@@ -1,7 +1,10 @@
 from datetime import date
 from typing import Literal
 from uuid import UUID
+
 from pydantic import BaseModel, Field
+
+from app.hospital.schemas import base as bh_schemas
 
 
 class User(BaseModel):
@@ -16,6 +19,9 @@ class User(BaseModel):
         default=None, description="The user's gender"
     )
     medical_id: str | None = Field(description="The user's medical id")
+    hospital: bh_schemas.Hospital | None = Field(
+        description="The details of the hospital"
+    )
     dob: date = Field(description="The user's dob")
     country: str = Field(description="The user's country", max_length=2)
     account_type: Literal["INDIVIDUAL", "PRACTITIONER", "ORGANIZATION"] | None = Field(

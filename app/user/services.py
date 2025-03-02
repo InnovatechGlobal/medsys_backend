@@ -1,7 +1,7 @@
-from typing import Literal
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.common.exceptions import BadRequest
+from app.hospital import services as hospital_services
+from app.hospital.schemas import create as hc_schemas
 from app.user import models
 from app.user.crud import UserCRUD
 from app.user.schemas import create, edit
@@ -27,65 +27,129 @@ async def create_user(data: create.UserCreate, db: AsyncSession):
     return user
 
 
-async def set_user(
-    user: models.User,
-    account_type: Literal["INDIVIDUAL", "PRACTITIONER"],
-    data: edit.UserEdit,
-    db: AsyncSession,
+async def setup_user_account(
+    user: models.User, data: edit.UserAccountSetup, db: AsyncSession
 ):
     """
-    Set user obj i.e. set initial details
+    Setup user account
 
     Args:
         user (models.User): The user obj
-        account_type ("INDIVIDUAL", "PRACTITIONER"): The user's account type
-        data (edit.UserEdit): The user's initial details
+        data (edit.UserAccountSetup): The payload for user account setup
         db (AsyncSession): The database session
 
-    Raises:
-        BadRequest
-
     Returns:
-        models.User: The updated user obj
+        models.User: The user obj
     """
-    # Init crud
-    user_crud = UserCRUD(db=db)
+    # NOTE: payloads for each account type will never be 'None' at this level due to the model_validator logic
 
-    # Edit email
-    if bool(user.email != data.email):
-        # Check: email isnt taken
-        if await user_crud.get(email=data.email):
-            raise BadRequest(msg="User with email exist", loc=["body", "email"])
-
-        # Update email
-        setattr(user, "email", data.email)
-
-    # Edit Gender
-    if bool(user.gender != data.gender):
-        setattr(user, "gender", data.gender)
-
-    # Check: only practitioners can have medical_ids
-    if data.medical_id and account_type != "PRACTITIONER":
-        raise BadRequest(
-            msg="Only practitioners can have a medical id", loc=["body", "medical_id"]
+    # Individual account setup
+    if data.account_type == "INDIVIDUAL":
+        user = await setup_individual_account(
+            user=user,
+            data=data.individual_payload,  # type: ignore
+            db=db,
         )
 
-    # Edit medical ID
-    if bool(user.medical_id != data.medical_id):
-        setattr(user, "medical_id", data.medical_id)
+    # Practitioner account setup
+    elif data.account_type == "PRACTITIONER":
+        user = await setup_practitioner_account(
+            user=user,
+            data=data.practitioner_payload,  # type: ignore
+            db=db,
+        )
 
-    # Set Account Type
-    if not bool(user.account_type):
-        # Check: practitioners must have medical IDs
-        if account_type == "PRACTITIONER" and not data.medical_id:
-            raise BadRequest(
-                "Practitioners must have medical IDs", loc=["body", "medical_id"]
-            )
+    # Org account setup
+    else:
+        user, _ = await setup_organization_account(
+            user=user,
+            data=data.organization_payload,  # type: ignore
+            db=db,
+        )
 
-        # Set account type
-        setattr(user, "account_type", account_type)
+    return user
+
+
+async def setup_individual_account(
+    user: models.User, data: edit.InvidiualUserAccountSetup, db: AsyncSession
+):
+    """
+    Setup Individual user account
+
+    Args:
+        user (models.User): The user obj
+        data (edit.InvidiualUserAccountSetup): The individual user account payload
+        db (AsyncSession): The database session
+
+    Returns:
+        models.User: The user obj with individual account type
+    """
+
+    # Set values
+    for field, value in data.model_dump().items():
+        setattr(user, field, value)
+
+    # Set account type
+    setattr(user, "account_type", "INDIVIDUAL")
 
     # Save changes
     await db.commit()
 
     return user
+
+
+async def setup_practitioner_account(
+    user: models.User, data: edit.PractitionerUserAccountSetup, db: AsyncSession
+):
+    """
+    Setup practitioner user account
+
+    Args:
+        user (models.User): The user obj
+        data (edit.PractitionerUserAccountSetup): The practitioner user account payload
+        db (AsyncSession): The database session
+
+    Returns:
+        models.User: The user obj with individual account type
+    """
+
+    # Set values
+    for field, value in data.model_dump().items():
+        setattr(user, field, value)
+
+    # Set account type
+    setattr(user, "account_type", "PRACTITIONER")
+
+    # Save changes
+    await db.commit()
+
+    return user
+
+
+async def setup_organization_account(
+    user: models.User, data: hc_schemas.HospitalCreate, db: AsyncSession
+):
+    """
+    Setup organization user account
+
+    Args:
+        user (models.User): The user obj
+        data (hc_schemas.HospitalCreate): The organization/hospital create payload
+        db (AsyncSession): The database session
+
+    Returns:
+        models.User, hospital_models.Hospital: The user obj with with hospital obj
+    """
+    # Create hospital
+    hospital = await hospital_services.create_hospital(user=user, data=data, db=db)
+
+    # Set account type
+    setattr(user, "account_type", "ORGANIZATION")
+
+    # Set hospital_id
+    setattr(user, "hospital_id", hospital.id)
+
+    # Save changes
+    await db.commit()
+
+    return user, hospital
