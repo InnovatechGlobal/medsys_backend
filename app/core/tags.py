@@ -18,6 +18,9 @@ class RouteTags(BaseModel):
     # Hospital
     HOSPITAL: str = "Hospital APIs"
 
+    # Integrations
+    CERNER: str = "Oracle Cerner APIs"
+
 
 @lru_cache
 def get_tags():

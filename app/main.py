@@ -9,6 +9,7 @@ from fastapi.responses import ORJSONResponse
 from sqlalchemy.orm import Session
 
 from app.auth.apis import router as auth_router
+from app.cerner.apis import router as cerner_router
 from app.common.dependencies import get_session
 from app.common.exceptions import (
     BadGatewayError,
@@ -94,3 +95,4 @@ async def health(_: Session = Depends(get_session)):
 app.include_router(auth_router, prefix="/auth", tags=[tags.AUTH])
 app.include_router(user_router, tags=[tags.USER])
 app.include_router(hospital_router, tags=[tags.HOSPITAL])
+app.include_router(cerner_router, tags=[tags.CERNER])
