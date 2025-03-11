@@ -1,7 +1,16 @@
+from datetime import date as _date
+
 from pydantic import BaseModel, Field
 
 
+######################################################################
+# Cerner Base
+######################################################################
 class PatientStatsChartEntry(BaseModel):
+    """
+    Base schema for the cerner patient stat entry
+    """
+
     label: str = Field(description="The label of the data")
     tn_admitted: int = Field(description="The total number of admitted patients")
     tn_discharged: int = Field(description="The total number of discharged patients")
@@ -77,4 +86,31 @@ class CernerHomepage(BaseModel):
     )
     clinic_metrics: list[CernerClinicMetricsSummary] = Field(
         description="The list of clinical metrics summaries"
+    )
+
+
+######################################################################
+# Cerner Appointment
+######################################################################
+class CernerAppointmentCalendarSummaryDay(BaseModel):
+    """
+    Base schema representing a day/date on the cerner appointment calendar
+    """
+
+    date: _date = Field(description="The date of the calendar day")
+    no_appointments: int = Field(description="The number of appointments on this day")
+
+
+class CernerAppointmentCalendarSummary(BaseModel):
+    """
+    Base schema for cerner appointment calendar summary
+    """
+
+    year: int = Field(
+        description="The year of the calendar",
+    )
+    month: int = Field(description="The month of the calendar")
+    days: dict[_date, CernerAppointmentCalendarSummaryDay] = Field(
+        default_factory=dict,
+        description="A dictionary mapping dates to their appointment counts and details",
     )

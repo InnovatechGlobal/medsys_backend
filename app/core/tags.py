@@ -19,7 +19,8 @@ class RouteTags(BaseModel):
     HOSPITAL: str = "Hospital APIs"
 
     # Integrations
-    CERNER: str = "Oracle Cerner APIs"
+    CERNER: str = "Cerner Endpoints"
+    CERNER_APPOINTMENT: str = "Cerner Appointment APIs"
 
 
 @lru_cache
