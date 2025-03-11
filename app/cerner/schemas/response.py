@@ -1,6 +1,10 @@
 from pydantic import Field
 
-from app.cerner.schemas.base import CernerAppointmentCalendarSummary, CernerHomepage
+from app.cerner.schemas.base import (
+    CernerAppointmentCalendarSummary,
+    CernerAppointmentSummary,
+    CernerHomepage,
+)
 from app.common.schemas import ResponseSchema
 
 
@@ -26,3 +30,11 @@ class CernerAppointmentCalendarSummaryResponse(ResponseSchema):
     data: CernerAppointmentCalendarSummary = Field(
         description="The appointment calendar summary"
     )
+
+
+class CernerAppointmentListResponse(ResponseSchema):
+    """
+    Response schema for cerner appointment list
+    """
+
+    data: list[CernerAppointmentSummary] = Field(description="The list of appointments")

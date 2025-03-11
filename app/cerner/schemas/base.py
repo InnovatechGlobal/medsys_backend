@@ -1,4 +1,5 @@
 from datetime import date as _date
+from datetime import time as _time
 
 from pydantic import BaseModel, Field
 
@@ -114,3 +115,18 @@ class CernerAppointmentCalendarSummary(BaseModel):
         default_factory=dict,
         description="A dictionary mapping dates to their appointment counts and details",
     )
+
+
+class CernerAppointmentSummary(BaseModel):
+    """
+    Base schema for cerner appointment summary
+    """
+
+    id: str = Field(description="The ID of the appointment")
+    start_time: _time = Field(description="The time of the appointment")
+    end_time: _time | None = Field(
+        default=None,
+    )
+    title: str = Field(description="The title of the appointment")
+    patient: str = Field(description="The name of the patient")
+    doctor: str = Field(description="The name of the doctor")
