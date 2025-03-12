@@ -4,6 +4,7 @@ from app.cerner.schemas.base import (
     CernerAppointmentCalendarSummary,
     CernerAppointmentSummary,
     CernerHomepage,
+    PatientDetails,
     PatientSummary,
 )
 from app.common.schemas import PaginatedResponseSchema, ResponseSchema
@@ -50,3 +51,11 @@ class PaginatedPatientListResponse(PaginatedResponseSchema):
     """
 
     data: list[PatientSummary] = Field(description="The list of patient summaries")
+
+
+class PatientDetailsResponse(ResponseSchema):
+    """
+    Response schema for patient details
+    """
+
+    data: PatientDetails = Field(description="The details of the patient")

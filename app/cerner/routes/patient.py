@@ -28,6 +28,7 @@ async def route_cerner_patient_list(
     return {
         "data": [
             {
+                "id": str(faker.random_number(5, fix_len=True)),
                 "mrn": faker.ssn(),
                 "name": f"{name} {faker.last_name()}" if name else faker.name(),
                 "phone": random.choice([faker.phone_number(), None]),
@@ -44,4 +45,30 @@ async def route_cerner_patient_list(
             "has_next_page": page < 10,
             "has_prev_page": page > 1,
         },
+    }
+
+
+@router.get(
+    "/{patient_id}/",
+    summary="Get patient details",
+    response_description="The patient's details",
+    status_code=200,
+    response_model=response.PatientDetailsResponse,
+)
+async def route_cerner_patient_details(patient_id: str, _: CurrentUser):
+    """
+    This enpoint returns the details of the patient
+    """
+
+    return {
+        "data": {
+            "id": patient_id,
+            "mrn": faker.ssn(),
+            "name": faker.name(),
+            "phone": random.choice([faker.phone_number(), None]),
+            "email": random.choice([faker.email(), None]),
+            "age": random.randint(1, 90),
+            "gender": random.choice(["Male", "Female"]),
+            "address": faker.address(),
+        }
     }

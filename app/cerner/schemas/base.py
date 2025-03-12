@@ -140,7 +140,46 @@ class PatientSummary(BaseModel):
     Base schema for patient summaries
     """
 
+    id: str = Field(description="The patient's ID")
     mrn: str = Field(description="The patient's mrn")
     name: str = Field(description="The patient's name")
     phone: str | None = Field(description="The patient's phone number")
     email: str | None = Field(description="The patient's email address")
+
+
+class PatientDetails(BaseModel):
+    """
+    Base schema for patient details
+    """
+
+    id: str = Field(description="The patient's ID")
+    mrn: str = Field(description="The patient's mrn")
+    name: str = Field(description="The patient's name")
+    phone: str | None = Field(description="The patient's phone number")
+    email: str | None = Field(description="The patient's email address")
+    age: int = Field(description="The age of the patient")
+    gender: str = Field(description="The patient's gender")
+    address: str = Field(description="The patient's address")
+
+
+class PatientVitalSigns(BaseModel):
+    """
+    Base schema for patient vital signs
+    """
+
+    bp: str | None = Field(description="The patient's blood pressure")
+    heart_rate: int = Field(description="The patient's heart rate in bpm")
+    temp: float | None = Field(description="The patient's recorded temp in degrees cel")
+    height: float | None = Field(description="The patient's height in meters")
+    weight: float | None = Field(description="The patient's weight in kg")
+    bmi: float | None = Field(description="The patient's body mass index in kg/m3")
+
+
+class PatitentLabAndSurgicalReport(BaseModel):
+    """
+    Base schema for patient lab and sergical reports
+    """
+
+    name: str = Field(description="The title of the report")
+    url: str = Field(description="The URL of the report")
+    uploaded_on: _date = Field(description="Indicator for when the report was uploaded")
