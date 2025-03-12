@@ -6,6 +6,7 @@ from app.cerner.schemas.base import (
     CernerHomepage,
     PatientDetails,
     PatientSummary,
+    PatientVitalSigns,
 )
 from app.common.schemas import PaginatedResponseSchema, ResponseSchema
 
@@ -59,3 +60,11 @@ class PatientDetailsResponse(ResponseSchema):
     """
 
     data: PatientDetails = Field(description="The details of the patient")
+
+
+class PatientVitalSignsResponse(ResponseSchema):
+    """
+    Response schema for patient vital signs
+    """
+
+    data: PatientVitalSigns = Field(description="The patient's vital signs")

@@ -72,3 +72,30 @@ async def route_cerner_patient_details(patient_id: str, _: CurrentUser):
             "address": faker.address(),
         }
     }
+
+
+@router.get(
+    "/{patient_id}/vitals",
+    summary="Get Patient Vitals",
+    response_description="The patient's vitals",
+    status_code=200,
+    response_model=response.PatientVitalSignsResponse,
+)
+async def route_cerner_patient_vitals(patient_id: str, _: CurrentUser):
+    """
+    This endpoint returns the patient's vital signs
+    """
+
+    # Remove unused args
+    del patient_id
+
+    return {
+        "data": {
+            "bp": random.choice(["135/85", None]),
+            "heart_rate": random.choice([random.randint(60, 120), None]),
+            "temp": random.choice([random.randint(36, 40), None]),
+            "height": random.choice([1, 7, 1.8, 1.9, None]),
+            "weight": random.choice([random.randint(50, 100), None]),
+            "bmi": random.choice([random.randint(20, 30), None]),
+        }
+    }
