@@ -68,7 +68,7 @@ async def route_cerner_appointment_list(date: _date, _: CurrentUser):
     """
     # Removes unused arg error
     del date
-    
+
     return {
         "data": [
             {

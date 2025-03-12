@@ -130,3 +130,17 @@ class CernerAppointmentSummary(BaseModel):
     title: str = Field(description="The title of the appointment")
     patient: str = Field(description="The name of the patient")
     doctor: str = Field(description="The name of the doctor")
+
+
+######################################################################
+# Patient
+######################################################################
+class PatientSummary(BaseModel):
+    """
+    Base schema for patient summaries
+    """
+
+    mrn: str = Field(description="The patient's mrn")
+    name: str = Field(description="The patient's name")
+    phone: str | None = Field(description="The patient's phone number")
+    email: str | None = Field(description="The patient's email address")

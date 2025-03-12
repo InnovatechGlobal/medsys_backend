@@ -21,6 +21,7 @@ class RouteTags(BaseModel):
     # Integrations
     CERNER: str = "Cerner Endpoints"
     CERNER_APPOINTMENT: str = "Cerner Appointment APIs"
+    CERNER_PATIENT: str = "Cerner Patient APIs"
 
 
 @lru_cache
