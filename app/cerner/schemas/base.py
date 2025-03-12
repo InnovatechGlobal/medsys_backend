@@ -175,7 +175,7 @@ class PatientVitalSigns(BaseModel):
     bmi: float | None = Field(description="The patient's body mass index in kg/m3")
 
 
-class PatitentLabAndSurgicalReport(BaseModel):
+class PatientLabAndSurgicalReport(BaseModel):
     """
     Base schema for patient lab and sergical reports
     """

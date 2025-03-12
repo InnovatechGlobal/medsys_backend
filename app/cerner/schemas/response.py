@@ -5,6 +5,7 @@ from app.cerner.schemas.base import (
     CernerAppointmentSummary,
     CernerHomepage,
     PatientDetails,
+    PatientLabAndSurgicalReport,
     PatientSummary,
     PatientVitalSigns,
 )
@@ -68,3 +69,13 @@ class PatientVitalSignsResponse(ResponseSchema):
     """
 
     data: PatientVitalSigns = Field(description="The patient's vital signs")
+
+
+class PatientLabAndSurgicalReportListResponse(ResponseSchema):
+    """
+    Response schema for patient lab and surgical reports
+    """
+
+    data: list[PatientLabAndSurgicalReport] = Field(
+        description="The patient's lab and surgical report list"
+    )

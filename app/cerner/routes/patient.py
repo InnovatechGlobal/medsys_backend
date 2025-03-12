@@ -99,3 +99,51 @@ async def route_cerner_patient_vitals(patient_id: str, _: CurrentUser):
             "bmi": random.choice([random.randint(20, 30), None]),
         }
     }
+
+
+@router.get(
+    "/{patient_id}/med-history",
+    summary="Get patient medical history (Not Functional)",
+    response_description="The list of the patient's medical history",
+    status_code=200,
+    response_model=None,
+    deprecated=True,
+)
+async def route_cerner_patient_medhistory_list():
+    """
+    This endpoint returns the list of the patient's medical history
+    """
+
+
+@router.get(
+    "/{patient_id}/treatment-history",
+    summary="Get patient treatment history (Not Functional)",
+    response_description="The list of the patient's treatment history",
+    status_code=200,
+    response_model=None,
+    deprecated=True,
+)
+async def route_cerner_patient_treatment_history_list():
+    """
+    This endpoint returns the list of the patient's treatment history
+    """
+
+
+@router.get(
+    "/{patient_id}/reports",
+    summary="Get patient lab reports (URLS are invalid)",
+    response_description="The list of the patient's lab reports",
+    status_code=200,
+    response_model=response.PatientLabAndSurgicalReportListResponse,
+)
+async def route_cerner_patient_report_list(_: CurrentUser):
+    """
+    This endpoint returns the list of the patient's lab reports
+    """
+
+    return {
+        "data": [
+            {"name": f"Report {i}", "url": faker.url(), "uploaded_on": faker.date()}
+            for i in range(random.randint(1, 10))
+        ]
+    }
