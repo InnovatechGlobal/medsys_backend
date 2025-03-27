@@ -26,7 +26,7 @@ def upgrade() -> None:
         sa.Column(
             "chat_id",
             sa.Integer,
-            sa.ForeignKey("chats.id", ondelete="CASCADE"),
+            sa.ForeignKey("medchats.id", ondelete="CASCADE"),
             nullable=False,
         ),
         sa.Column(
@@ -57,3 +57,6 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_table("medchat_messages")
+    op.execute("DROP TYPE IF EXISTS enum_chatmsg_type")
+    op.execute("DROP TYPE IF EXISTS enum_chatmsg_sender")
+    op.execute("DROP TYPE IF EXISTS enum_attachment_type")

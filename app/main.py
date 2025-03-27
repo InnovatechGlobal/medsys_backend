@@ -26,6 +26,7 @@ from app.core.handlers import (
 from app.core.tags import get_tags
 from app.hospital.apis import router as hospital_router
 from app.user.apis import router as user_router
+from app.websocket.route import router as ws_router
 
 # Globals
 tags = get_tags()
@@ -92,6 +93,7 @@ async def health(_: Session = Depends(get_session)):
 
 
 # Routers
+app.include_router(ws_router, tags=["Websocket"])
 app.include_router(auth_router, prefix="/auth", tags=[tags.AUTH])
 app.include_router(user_router, tags=[tags.USER])
 app.include_router(hospital_router, tags=[tags.HOSPITAL])

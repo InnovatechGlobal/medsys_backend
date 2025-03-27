@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     CRIIPTO_VERIFY_CLIENT_ID: str = os.environ.get("CRIIPTO_VERIFY_CLIENT_ID")
     CRIIPTO_VERIFY_CLIENT_SECRET: str = os.environ.get("CRIIPTO_VERIFY_CLIENT_SECRET")
 
+    # OpenAI
+    OPENAI_API_KEY: str = os.environ.get("OPENAI_API_KEY")
+
     # DB Settings
     POSTGRES_DATABASE_URL: str = os.environ.get("POSTGRES_DATABASE_URL")
 

@@ -7,7 +7,7 @@ from sqlalchemy.orm import Mapped, relationship
 from app.core.database import DBBase
 
 
-class Chat(DBBase):
+class MedChat(DBBase):
     """
     Database model for chats
     """
@@ -24,12 +24,12 @@ class Chat(DBBase):
     updated_at = Column(DateTime(timezone=True), onupdate=datetime.now, nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.now, nullable=False)
 
-    messages: Mapped[list["ChatMessage"] | None] = relationship(
-        "ChatMessage", lazy="immediate", backref="chats"
+    messages: Mapped[list["MedChatMessage"] | None] = relationship(
+        "MedChatMessage", lazy="immediate", backref="chats"
     )
 
 
-class ChatMessage(DBBase):
+class MedChatMessage(DBBase):
     """
     Database model for chats
     """
@@ -39,7 +39,7 @@ class ChatMessage(DBBase):
     id = Column(Integer, primary_key=True, nullable=False)
     chat_id = Column(
         Integer,
-        ForeignKey("chats.id", ondelete="CASCADE"),
+        ForeignKey("medchats.id", ondelete="CASCADE"),
         nullable=False,
     )
     sender = Column(Enum("system", "user", name="enum_chatmsg_sender"), nullable=False)

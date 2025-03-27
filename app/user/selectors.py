@@ -1,15 +1,16 @@
 from typing import Annotated, cast
 from uuid import UUID
-from fastapi import Header
+
+from fastapi import Header, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.common.annotations import DatabaseSession
 from app.common.exceptions import InvalidToken
 from app.common.token import TokenGenerator
 from app.core.settings import get_settings
 from app.user import models
 from app.user.crud import UserCRUD
 from app.user.exceptions import UserDeactivated, UserNotFound
-from app.common.annotations import DatabaseSession
 
 # Globals
 settings = get_settings()
@@ -31,6 +32,17 @@ async def get_current_user(
             msg="Invalid Token Header, format is 'Bearer {token}",
             loc=["headers", "Authorization"],
         )
+
+    # Get token sub / user ID
+    sub: str = await token_generator.verify(token=token, sub_head="USER")
+
+    return cast(models.User, await get_user_by_id(id=sub, db=db))
+
+
+async def get_current_ws_user(token: Annotated[str, Query()], db: DatabaseSession):
+    """
+    Get the current logged in user
+    """
 
     # Get token sub / user ID
     sub: str = await token_generator.verify(token=token, sub_head="USER")
