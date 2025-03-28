@@ -47,7 +47,7 @@ async def ws_chat(ws: WebSocket, token: str, db: DatabaseSession):
                 await ws.close(code=4000, reason="Invalid Payload")
                 return
 
-            # Handler for chat-create
+            # Handler: chat-create
             if payload.type == "medchat-create":
                 # Validate base payload
                 try:
@@ -57,7 +57,7 @@ async def ws_chat(ws: WebSocket, token: str, db: DatabaseSession):
                         {
                             "type": "validation-error",
                             "data": {
-                                "msg": "Invalid chat-create payload",
+                                "msg": "Invalid medchat-create payload",
                                 "errors": e.errors(),
                             },
                         }
@@ -67,6 +67,29 @@ async def ws_chat(ws: WebSocket, token: str, db: DatabaseSession):
 
                 # Handle event
                 await handlers.handle_medchat_create(
+                    ws=ws, user=curr_user, data=data, db=db
+                )
+
+            # Handler: medchat-interaction
+            elif payload.type == "medchat-interaction":
+                # Validate base payload
+                try:
+                    data = mc_schemas.WsMedChatInteraction.model_validate(payload.data)
+                except ValidationError as e:
+                    await ws.send_json(
+                        {
+                            "type": "validation-error",
+                            "data": {
+                                "msg": "Invalid medchat-interaction payload",
+                                "errors": e.errors(),
+                            },
+                        }
+                    )
+                    await ws.close(code=4000, reason="Invalid Payload")
+                    return
+
+                # Handle event
+                await handlers.handle_medchat_interaction(
                     ws=ws, user=curr_user, data=data, db=db
                 )
 

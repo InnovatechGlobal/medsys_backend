@@ -9,7 +9,7 @@ class MedChatMessageCreate(BaseModel):
     """
 
     type: Literal["text"]
-    content: str | None
+    content: str
 
 
 class WsMedChatCreate(MedChatMessageCreate):
@@ -18,10 +18,9 @@ class WsMedChatCreate(MedChatMessageCreate):
     """
 
 
-class WsMedChatInteraction(BaseModel):
+class WsMedChatInteraction(MedChatMessageCreate):
     """
     Create schema for medchat interactions
     """
 
     chat_id: int
-    msg: str
