@@ -62,3 +62,30 @@ class MedChatMessageCRUD(CRUDBase[models.MedChat]):
 
     def __init__(self, *, db: AsyncSession):
         super().__init__(models.MedChatMessage, db=db)
+
+    async def get_list(self, medchat: models.MedChat, page: int, size: int):
+        """
+        Get list of messages
+        """
+
+        # Form qs
+        q = (
+            select(self.model)
+            .filter_by(chat_id=medchat.id)
+            .order_by(self.model.created_at.desc())
+        )
+
+        # Paginate
+        p_qs = q.limit(size).offset(size * (page - 1))
+
+        # Execute paginated qs
+        results = await self.db.execute(p_qs)
+
+        # Execute count query
+        count = cast(
+            int,
+            # pylint: disable=not-callable
+            await self.db.scalar(select(func.count()).select_from(q.subquery())),
+        )
+
+        return list(results.scalars().all()), count

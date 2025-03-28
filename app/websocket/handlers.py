@@ -66,9 +66,15 @@ async def handle_medchat_create(
         )
     )
 
-    # Create message
+    # Create messages
     await medchat_services.create_message(
-        medchat=medchat, sender="system", data=data, db=db
+        medchat=medchat, sender="user", data=data, db=db
+    )
+    await medchat_services.create_message(
+        medchat=medchat,
+        sender="system",
+        data=mc_schemas.MedChatMessageCreate(type="text", content=resp),
+        db=db,
     )
 
     # Stream title
