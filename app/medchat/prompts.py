@@ -2,6 +2,9 @@ MEDCHAT_TITLE_PROMPT = """
 Generate a concise and relevant chat title. The title should reflect the main focus of the conversation, such as credit improvement,
 debt management, dispute resolution, or score analysis. Keep it under 10 words and ensure it remains clear and professional.
 Below is the user's message \n {msg}
+
+NOTE:
+- If a patient ID or MRN is provided then use it as a prefix i.e. Patient 23542 - Cancer Diagnosis
 """
 
 MEDCHAT_SYS_PROMPT = """

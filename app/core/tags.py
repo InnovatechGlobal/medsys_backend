@@ -15,6 +15,9 @@ class RouteTags(BaseModel):
     # User
     USER: str = "User APIs"
 
+    # Medchat
+    MEDCHAT: str = "MedChat APIs"
+
     # Hospital
     HOSPITAL: str = "Hospital APIs"
 

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import WebSocket
 from fastapi.encoders import jsonable_encoder
 from openai import OpenAI
@@ -139,6 +141,10 @@ async def handle_medchat_interaction(
             }
         )
         return
+
+    # Update: updated_at
+    setattr(medchat, "updated_at", datetime.now())
+    await db.commit()
 
     # Form messages
     messages = [
