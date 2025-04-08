@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     # App
     DEBUG: bool = os.environ.get("DEBUG")
     OAUTH2_STATE_EXPIRE_MIN: int = os.environ.get("OAUTH2_STATE_EXPIRE_MIN")
+    MEDIA_DIR: str = os.environ.get("MEDIA_DIR")
 
     # Security
     SECRET_KEY: str = os.environ.get("SECRET_KEY")

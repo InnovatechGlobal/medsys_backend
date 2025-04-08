@@ -1,6 +1,15 @@
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String, Text
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, relationship
 
@@ -49,6 +58,8 @@ class MedChatMessage(DBBase):
     attachment_url = Column(String, nullable=True)
     attachment_name = Column(String, nullable=True)
     attachment_type = Column(
-        Enum("img", "pdf", name="enum_attachment_type"), nullable=True
+        Enum("docx", "pdf", name="enum_attachment_type"), nullable=True
     )
+    attachment_content = Column(Text, nullable=True)
+    hidden = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime(timezone=True), default=datetime.now, nullable=False)

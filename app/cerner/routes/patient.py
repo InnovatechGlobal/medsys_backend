@@ -19,7 +19,7 @@ faker = Faker()
     response_model=response.PaginatedPatientListResponse,
 )
 async def route_cerner_patient_list(
-    _: CurrentUser, name: str | None = None, page: int = 1, size: int = 10
+    _: CurrentUser, name: str, page: int = 1, size: int = 10
 ):
     """
     This endpoint returns a paginated list of patients

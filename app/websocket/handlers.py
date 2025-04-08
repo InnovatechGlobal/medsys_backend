@@ -32,6 +32,11 @@ async def handle_medchat_create(
     # Create medchat
     medchat = await medchat_services.create_medchat(user=user, db=db)
 
+    # Check: attachment
+    if data.attachment:
+        # Decode base6
+        ...
+
     # Generate response
     sys_resp = oai_client.chat.completions.create(
         messages=[
