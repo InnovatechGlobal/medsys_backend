@@ -26,7 +26,7 @@ async def ws_chat(ws: WebSocket, token: str, db: DatabaseSession):
 
     # Check: valid user
     try:
-        curr_user = await user_selectors.get_current_ws_user(token=token, db=db)
+        curr_user = await user_selectors.get_current_ws_user(ws=ws, token=token, db=db)
     except Unauthorized as e:
         await ws.send_json({"type": "auth-error", "data": {"msg": e.msg}})
         await ws.close(code=4001, reason="Auth failure")
@@ -53,12 +53,18 @@ async def ws_chat(ws: WebSocket, token: str, db: DatabaseSession):
                 try:
                     data = mc_schemas.WsMedChatCreate.model_validate(payload.data)
                 except ValidationError as e:
+                    errors = e.errors()
+                    for err in errors:
+                        if "ctx" in err and "error" in err["ctx"]:
+                            err["ctx"]["error"] = str(
+                                err["ctx"]["error"]
+                            )  # Convert to string
                     await ws.send_json(
                         {
                             "type": "validation-error",
                             "data": {
                                 "msg": "Invalid medchat-create payload",
-                                "errors": e.errors(),
+                                "errors": errors,
                             },
                         }
                     )

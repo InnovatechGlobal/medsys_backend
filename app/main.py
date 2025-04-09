@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 
 from anyio import to_thread
@@ -5,7 +6,7 @@ from fastapi import Depends, FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import ORJSONResponse
+from fastapi.responses import FileResponse, ORJSONResponse
 from sqlalchemy.orm import Session
 
 from app.auth.apis import router as auth_router
@@ -15,6 +16,7 @@ from app.common.exceptions import (
     BadGatewayError,
     CustomHTTPException,
     InternalServerError,
+    NotFound,
 )
 from app.core.handlers import (
     bad_gateway_error_exception_handler,
@@ -23,6 +25,7 @@ from app.core.handlers import (
     internal_server_error_exception_handler,
     request_validation_exception_handler,
 )
+from app.core.settings import get_settings
 from app.core.tags import get_tags
 from app.hospital.apis import router as hospital_router
 from app.medchat.apis import router as medchat_router
@@ -31,6 +34,7 @@ from app.websocket.route import router as ws_router
 
 # Globals
 tags = get_tags()
+settings = get_settings()
 
 
 # Lifespan (startup, shutdown)
@@ -91,6 +95,20 @@ app.add_exception_handler(CustomHTTPException, custom_http_exception_handler)  #
 async def health(_: Session = Depends(get_session)):
     """App Healthcheck"""
     return {"status": "Ok!"}
+
+
+# Media download
+@app.get("/media/{path:path}")
+async def media_download(
+    path: str,
+):
+    """
+    Download media
+    """
+    if not os.path.exists(path) or not os.path.isfile(path):
+        raise NotFound("File not found")
+
+    return FileResponse(path=path)
 
 
 # Routers

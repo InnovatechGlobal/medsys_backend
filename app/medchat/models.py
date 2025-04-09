@@ -30,6 +30,9 @@ class MedChat(DBBase):
         nullable=False,
     )
     title = Column(String(255), nullable=False)
+    patient_id = Column(String, nullable=False)
+    patient_service = Column(String, default="cerner", nullable=False)
+    patient_context = Column(Text, nullable=False)
     updated_at = Column(DateTime(timezone=True), onupdate=datetime.now, nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.now, nullable=False)
 

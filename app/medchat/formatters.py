@@ -1,4 +1,8 @@
+from app.core.settings import get_settings
 from app.medchat import models
+
+# Globals
+settings = get_settings()
 
 
 async def format_medchat(medchat: models.MedChat):
@@ -25,8 +29,12 @@ async def format_medchat_message(msg: models.MedChatMessage):
         "type": msg.type,
         "content": msg.content,
         "audio_url": msg.audio_url,
-        "attachment_url": msg.attachment_url,
-        "attachment_name": msg.attachment_name,
-        "attachment_type": msg.attachment_type,
+        "attachment": {
+            "attachment_url": settings.MEDIA_URL + msg.attachment_url,
+            "attachment_name": msg.attachment_name,
+            "attachment_type": msg.attachment_type,
+        }
+        if msg.attachment_url  # type: ignore
+        else None,
         "created_at": msg.created_at,
     }

@@ -9,7 +9,7 @@ from app.core.settings import get_settings
 settings = get_settings()
 
 
-def save_base64_file(base64_str: str, file_type: Literal["pdf", "docx"]) -> str:
+async def save_base64_file(base64_str: str, file_type: Literal["pdf", "docx"]) -> str:
     """
     Save a base64-encoded file to disk and return the path.
     """
@@ -24,8 +24,8 @@ def save_base64_file(base64_str: str, file_type: Literal["pdf", "docx"]) -> str:
 
     filename = f"{uuid.uuid4()}.{file_type}"
     file_path = settings.MEDIA_DIR + f"files/{filename}"
-
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
     with open(file_path, "wb") as f:
         f.write(file_data)
 

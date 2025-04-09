@@ -55,7 +55,7 @@ class MedChatCRUD(CRUDBase[models.MedChat]):
         return list(results.scalars().all()), count
 
 
-class MedChatMessageCRUD(CRUDBase[models.MedChat]):
+class MedChatMessageCRUD(CRUDBase[models.MedChatMessage]):
     """
     CRUD Class for med chat messages
     """

@@ -1,7 +1,7 @@
 from typing import Annotated, cast
 from uuid import UUID
 
-from fastapi import Header, Query
+from fastapi import HTTPException, Header, Query, WebSocket, WebSocketDisconnect
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common.annotations import DatabaseSession
@@ -39,13 +39,19 @@ async def get_current_user(
     return cast(models.User, await get_user_by_id(id=sub, db=db))
 
 
-async def get_current_ws_user(token: Annotated[str, Query()], db: DatabaseSession):
+async def get_current_ws_user(
+    ws: WebSocket, token: Annotated[str, Query()], db: DatabaseSession
+):
     """
     Get the current logged in user
     """
 
     # Get token sub / user ID
-    sub: str = await token_generator.verify(token=token, sub_head="USER")
+    try:
+        sub: str = await token_generator.verify(token=token, sub_head="USER")
+    except HTTPException as e:
+        await ws.send_json({"type": "auth-error", "data": {"msg": e.detail}})
+        raise WebSocketDisconnect(code=4001, reason=e.detail)
 
     return cast(models.User, await get_user_by_id(id=sub, db=db))
 

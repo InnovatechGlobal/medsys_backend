@@ -38,10 +38,23 @@ class MedChatAttachmentCreate(BaseModel):
         return v
 
 
+class InternalMedChatAttachmentCreate(BaseModel):
+    """
+    Create schema for medchat attachments
+    """
+
+    attachment_url: str
+    attachment_name: str
+    attachment_type: Literal["pdf", "docx"]
+    attachment_content: str
+
+
 class WsMedChatCreate(MedChatMessageCreate):
     """
     Create schema for ws med chat create
     """
+
+    patient_id: str
 
 
 class WsMedChatInteraction(MedChatMessageCreate):

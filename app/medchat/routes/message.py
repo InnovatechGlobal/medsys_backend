@@ -50,7 +50,11 @@ async def route_medchat_message_list(
 
     return {
         # NOTE: reverse messages so it will be top-bottom
-        "data": [await format_medchat_message(msg=msg) for msg in msgs][::-1],
+        "data": [
+            await format_medchat_message(msg=msg)
+            for msg in msgs
+            if not msg.hidden  # type: ignore
+        ][::-1],
         "meta": await get_pagination_metadata(
             tno_items=tno_msgs, count=len(msgs), page=page, size=size
         ),
