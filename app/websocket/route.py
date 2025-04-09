@@ -1,4 +1,5 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+import jwt
+from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import ValidationError
 from websockets import ConnectionClosedError, ConnectionClosedOK
 
@@ -27,8 +28,21 @@ async def ws_chat(ws: WebSocket, token: str, db: DatabaseSession):
     # Check: valid user
     try:
         curr_user = await user_selectors.get_current_ws_user(ws=ws, token=token, db=db)
-    except Unauthorized as e:
-        await ws.send_json({"type": "auth-error", "data": {"msg": e.msg}})
+    except (
+        Unauthorized,
+        HTTPException,
+        jwt.exceptions.ExpiredSignatureError,
+        jwt.PyJWTError,
+        jwt.exceptions.InvalidSignatureError,
+    ) as e:
+        if isinstance(e, Unauthorized):
+            error_msg = e.msg
+        elif isinstance(e, HTTPException):
+            error_msg = e.detail
+        else:
+            error_msg = str(e)
+
+        await ws.send_json({"type": "auth-error", "data": {"msg": error_msg}})
         await ws.close(code=4001, reason="Auth failure")
         return
 
@@ -116,7 +130,8 @@ async def ws_chat(ws: WebSocket, token: str, db: DatabaseSession):
         ConnectionClosedError,
         ConnectionClosedOK,
     ) as e:
-        raise e
+        if isinstance(e, Exception):
+            raise e
 
     finally:
         # Always close the database session at the end of the connection

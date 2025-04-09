@@ -1,11 +1,11 @@
 from typing import Annotated, cast
 from uuid import UUID
 
-from fastapi import HTTPException, Header, Query, WebSocket, WebSocketDisconnect
+from fastapi import Header, HTTPException, Query, WebSocket
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common.annotations import DatabaseSession
-from app.common.exceptions import InvalidToken
+from app.common.exceptions import InvalidToken, Unauthorized
 from app.common.token import TokenGenerator
 from app.core.settings import get_settings
 from app.user import models
@@ -50,8 +50,7 @@ async def get_current_ws_user(
     try:
         sub: str = await token_generator.verify(token=token, sub_head="USER")
     except HTTPException as e:
-        await ws.send_json({"type": "auth-error", "data": {"msg": e.detail}})
-        raise WebSocketDisconnect(code=4001, reason=e.detail)
+        raise Unauthorized(msg=e.detail)
 
     return cast(models.User, await get_user_by_id(id=sub, db=db))
 
