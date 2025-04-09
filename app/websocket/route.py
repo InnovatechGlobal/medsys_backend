@@ -96,12 +96,18 @@ async def ws_chat(ws: WebSocket, token: str, db: DatabaseSession):
                 try:
                     data = mc_schemas.WsMedChatInteraction.model_validate(payload.data)
                 except ValidationError as e:
+                    errors = e.errors()
+                    for err in errors:
+                        if "ctx" in err and "error" in err["ctx"]:
+                            err["ctx"]["error"] = str(
+                                err["ctx"]["error"]
+                            )  # Convert to string
                     await ws.send_json(
                         {
                             "type": "validation-error",
                             "data": {
                                 "msg": "Invalid medchat-interaction payload",
-                                "errors": e.errors(),
+                                "errors": errors,
                             },
                         }
                     )
