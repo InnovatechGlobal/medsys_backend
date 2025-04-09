@@ -6,7 +6,11 @@ from fastapi.encoders import jsonable_encoder
 from openai import OpenAI
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.common.utils import extract_text_from_docx, extract_text_from_pdf
+from app.common.utils import (
+    extract_text_from_docx,
+    extract_text_from_pdf,
+    trim_text_to_token_limit,
+)
 from app.core.settings import get_settings
 from app.medchat import selectors as medchat_selectors
 from app.medchat import services as medchat_services
@@ -249,7 +253,10 @@ async def handle_medchat_interaction(
             text_content = await extract_text_from_docx(filepath=filepath)
 
         # Update prompt
-        attachment_prompt = f"Use the below information to answer the following questions if related:\n{text_content}"
+        attachment_prompt = (
+            "Use the below information to answer the following questions if related:\n"
+            f"{await trim_text_to_token_limit(text_content)}"
+        )
 
         # Create attachment_details
         attachment_details = {}

@@ -25,7 +25,7 @@ class MedChatMessageAttachment(BaseModel):
 
     attachment_url: str | None = Field(description="The URL of the attachment")
     attachment_name: str | None = Field(description="The name of the attachment")
-    attachment_type: Literal["img", "pdf", None] = Field(
+    attachment_type: Literal["docx", "pdf", None] = Field(
         description="The type of the attachment"
     )
 
