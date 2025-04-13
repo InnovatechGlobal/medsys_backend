@@ -28,6 +28,10 @@ async def create_medchat(user: user_models.User, patient_id: str, db: AsyncSessi
     # Init crud
     medchat_crud = MedChatCRUD(db=db)
 
+    # Check: patient medchat exists
+    if obj := await medchat_crud.get(patient_id=patient_id):
+        return obj
+
     # TEMP: get random diagnosis
     sys_resp = oai_client.chat.completions.create(
         messages=[

@@ -3,7 +3,7 @@ from typing import cast
 from fastapi import APIRouter
 
 from app.common.annotations import DatabaseSession
-from app.common.exceptions import Forbidden
+from app.common.exceptions import BadRequest, Forbidden
 from app.common.paginators import get_pagination_metadata
 from app.medchat import models, selectors
 from app.medchat.crud import MedChatMessageCRUD
@@ -23,20 +23,29 @@ router = APIRouter()
     response_model=response.PaginatedMedChatMessageListResponse,
 )
 async def route_medchat_message_list(
-    medchat_id: int,
     curr_user: CurrentUser,
     db: DatabaseSession,
     page: int = 1,
     size: int = 10,
+    medchat_id: int | None = None,
+    patient_id: str | None = None,
 ):
     """
     This endpoint returns the list of messages in a medchat
     """
 
     # Get medchat
-    medchat = cast(
-        models.MedChat, await selectors.get_medchat_by_id(id=medchat_id, db=db)
-    )
+    if medchat_id:
+        medchat = cast(
+            models.MedChat, await selectors.get_medchat_by_id(id=medchat_id, db=db)
+        )
+    elif patient_id:
+        medchat = cast(
+            models.MedChat,
+            await selectors.get_medchat_by_patient_id(id=patient_id, db=db),
+        )
+    else:
+        raise BadRequest("medchat_id or patient_id need to be provided")
 
     # Check: ownership
     if medchat.user_id != curr_user.id:  # type: ignore

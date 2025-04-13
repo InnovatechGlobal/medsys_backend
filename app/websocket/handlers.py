@@ -14,10 +14,13 @@ from app.common.utils import (
 from app.core.settings import get_settings
 from app.medchat import selectors as medchat_selectors
 from app.medchat import services as medchat_services
-from app.medchat.prompts import MEDCHAT_SYS_PROMPT, MEDCHAT_TITLE_PROMPT
+from app.medchat.prompts import (
+    MEDCHAT_ATTACHMENT_CONTENT_PROMPT,
+    MEDCHAT_SYS_PROMPT,
+)
 from app.medchat.schemas import create as mc_schemas
 from app.user import models as user_models
-from app.websocket import utils
+from app.websocket import schemas, utils
 from app.websocket.types import WSResponseTypes
 
 # Globals
@@ -71,11 +74,35 @@ async def handle_medchat_create(
         else:
             text_content = await extract_text_from_docx(filepath=filepath)
 
+        # Check: valid medical
+        resp = oai_client.beta.chat.completions.parse(
+            messages=[
+                {"role": "system", "content": MEDCHAT_ATTACHMENT_CONTENT_PROMPT},
+                {"role": "user", "content": text_content},
+            ],
+            model="gpt-4o",
+            response_format=schemas.MedChatAttachmentContentCheck,
+        )
+        if not resp.choices[0].message.parsed.is_valid:  # type: ignore
+            await ws.send_json(
+                {
+                    "type": "validation-error",
+                    "data": {
+                        "msg": "Contents of the attachment is not a medical document or medical related"
+                    },
+                }
+            )
+
+            # Delete medchat
+            await db.delete(medchat)
+            await db.commit()
+
+            return
+
         # Update prompt
         attachment_prompt = f"Use the below information to answer the following questions if related:\n{text_content}"
 
         # Create attachment_details
-        print(filepath)
         attachment_details = {}
         attachment_details["attachment_url"] = filepath
         attachment_details["attachment_name"] = os.path.basename(filepath)
@@ -150,6 +177,7 @@ async def handle_medchat_create(
             data=mc_schemas.MedChatMessageCreate(
                 type="text", content=attachment_prompt, attachment=None
             ),
+            hidden=True,
             db=db,
         )
 
@@ -161,44 +189,8 @@ async def handle_medchat_create(
         db=db,
     )
 
-    # Stream title
-    sys_resp = oai_client.chat.completions.create(
-        messages=[
-            {
-                "role": "user",
-                "content": MEDCHAT_TITLE_PROMPT.format(msg=data.content),
-            },
-        ],
-        model="gpt-4o",
-        stream=True,
-    )
-    response_chunks = []
-    for chunk in sys_resp:
-        content = chunk.choices[0].delta.content
-        if content:
-            response_chunks.append(content)
-            await ws.send_json(
-                data=jsonable_encoder(
-                    {
-                        "type": wsresp.medchattitle_stream,
-                        "data": {"chat_id": medchat.id, "content": content},
-                    }
-                )
-            )
-
-    # Form full title
-    title = "".join(response_chunks)
-    await ws.send_json(
-        data=jsonable_encoder(
-            {
-                "type": wsresp.medchattitle_stream_comp,
-                "data": {"chat_id": medchat.id, "content": title},
-            }
-        )
-    )
-
     # Save title
-    setattr(medchat, "title", title)
+    setattr(medchat, "title", f"Medchat - {data.patient_id}")
     await db.commit()
 
     return medchat
@@ -335,6 +327,7 @@ async def handle_medchat_interaction(
             data=mc_schemas.MedChatMessageCreate(
                 type="text", content=attachment_prompt, attachment=None
             ),
+            hidden=True,
             db=db,
         )
 

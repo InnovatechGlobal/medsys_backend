@@ -10,3 +10,11 @@ class BaseInputPayload(BaseModel):
 
     type: Literal["medchat-create", "medchat-interaction"]
     data: dict
+
+
+class MedChatAttachmentContentCheck(BaseModel):
+    """
+    Base schema for medchat attachment checks
+    """
+
+    is_valid: bool

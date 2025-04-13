@@ -54,3 +54,8 @@ You are **MedAssistAI**, an advanced **medical assistant** designed to support a
 - If data is insufficient, ask the doctor for **key clarifications** before proceeding.
 - Remain neutral and professional—no speculation beyond medical reasoning.
 """
+
+
+MEDCHAT_ATTACHMENT_CONTENT_PROMPT = """
+Check if the below details is related to medicine or any medical diagnosis
+"""
